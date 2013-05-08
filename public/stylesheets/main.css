@@ -1,0 +1,19 @@
+body {
+    margin: 50px;
+    font-family: sans-serif;
+}
+
+h1 {
+    font-size: 1.2em;
+}
+
+#metricsText {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+#urlField {
+    width: 400px;
+}
+.metricVal {
+    font-weight: bold;
+}

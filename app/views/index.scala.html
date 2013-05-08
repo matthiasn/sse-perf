@@ -1,7 +1,56 @@
 @(message: String)
 
-@main("Welcome to Play 2.1") {
+@main("Performance Test Tool for Server Sent Events") {
+
+    <h1>Performance Test Tool for Server Sent Events</h1>
     
-    @play20.welcome(message)
+    <div>
+        <input id="urlField" value="http://localhost:9000/tweetFeedCF" width="300" /><br />
+        <button onclick="addClients(1)">+1</button>
+        <button onclick="addClients(10)">+10</button>
+        <button onclick="addClients(50)">+50</button>
+
+        <button onclick="removeClients(1)">-1</button>
+        <button onclick="removeClients(10)">-10</button>
+        <button onclick="removeClients(50)">-50</button>
+        
+        <div id="metricsText">
+          Clients active: <span class="metricVal" id="clientsActive">0</span> total: <span class="metricVal" id="clientsTotal">0</span><br />
+          KB/s: <span class="metricVal" id="KBReceived"></span><br />
+          MB total: <span class="metricVal" id="MBtotal"></span><br />
+          Msg total: <span class="metricVal" id="MsgTotal">0</span><br />
+          Msg/s: <span class="metricVal" id="MsgS">0</span><br />
+        </div>
+    </div>
+    
+    <script>
+
+        var feed = new EventSource('/metricsFeed');
+        feed.addEventListener('message', handler, false);
+
+        function handler(msg){
+          var data = JSON.parse(msg.data);
+          $("#clientsTotal").html(data.clients);
+          $("#clientsActive").html(data.activeClients);
+          $("#KBReceived").html((+data.bytesReceived / 1024 / +data.msSinceLastReset * 1000).toFixed(1));
+          $("#MBtotal").html((+data.bytesReceivedTotal / 1024 / 1024).toFixed(3));
+          $("#MsgTotal").html(data.chunksTotal);
+          $("#MsgS").html((+data.chunks / +data.msSinceLastReset * 1000).toFixed(0));
+        console.log(data);       
+        }
+        
+        function addClients(n) {
+          $.get("/clients/add?n=" + n + "&url=" + $("#urlField").val(), function(data) {
+            console.log(data);
+          });
+        }
+
+        function removeClients(n) {
+          $.get("/clients/remove?n=" + n, function(data) {
+            console.log(data);
+          });
+        }
+        
+    </script>
     
 }
