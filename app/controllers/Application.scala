@@ -19,13 +19,6 @@ object Application extends Controller {
       Ok("AddClients message dispatched: " + n + " " + url)
     }
   }
-
-  def removeClients(n: Int) = Action {
-    implicit req => {
-      Metrics.wsClientSupervisor ! Metrics.RemoveClients(n)
-      Ok("RemoveClients message dispatched")
-    }
-  }
   
   def removeAllClients = Action {
     implicit req => {

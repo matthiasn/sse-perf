@@ -28,7 +28,6 @@ object Metrics {
   /** Protocol for Twitter Client actors */
   case class Received(bytes: Long)
   case class AddClients(n: Int, url: String)
-  case class RemoveClients(n: Int)
   case object RemoveAllClients
   case object PublishMetrics
 
@@ -65,19 +64,12 @@ object Metrics {
         }
       }
 
-      case RemoveClients(n) => clients.toSeq.take(n).foreach { 
-        ref => {
-          context.stop(ref)
-          clients.remove(ref)
-        }
-      }
+      case RemoveAllClients => {
+        clients.foreach { ref => context.stop(ref) }
 
-      case RemoveAllClients => clients.foreach { 
-        ref => {        
-          context.stop(ref)        
-          clients.remove(ref)
-        }
-      }         
+        WS.resetClient()
+        clients = scala.collection.mutable.Set[ActorRef]()
+      }
 
       case PublishMetrics => {
 

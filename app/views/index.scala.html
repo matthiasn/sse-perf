@@ -10,10 +10,8 @@
         <button onclick="addClients(10)">+10</button>
         <button onclick="addClients(50)">+50</button>
 
-        <button onclick="removeClients(1)">-1</button>
-        <button onclick="removeClients(10)">-10</button>
-        <button onclick="removeClients(50)">-50</button>
-        
+        <button onclick="removeAll()">Remove Clients</button>
+
         <div id="metricsText">
           Clients active: <span class="metricVal" id="clientsActive">0</span> total: <span class="metricVal" id="clientsTotal">0</span><br />
           KB/s: <span class="metricVal" id="KBReceived"></span><br />
@@ -45,8 +43,8 @@
           });
         }
 
-        function removeClients(n) {
-          $.get("/clients/remove?n=" + n, function(data) {
+        function removeAll() {
+          $.get("/clients/removeAll", function(data) {
             console.log(data);
           });
         }
