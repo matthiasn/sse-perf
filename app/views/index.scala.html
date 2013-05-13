@@ -6,49 +6,45 @@
     
     <div>
         <input id="urlField" value="http://localhost:9000/tweetFeedCF" width="300" /><br />
-        <button onclick="addClients(1)">+1</button>
-        <button onclick="addClients(10)">+10</button>
-        <button onclick="addClients(50)">+50</button>
+        <button id="addOneButton">+1</button>
+        <button id="addTenButton">+10</button>
+        <button id="addFiftyButton">+50</button>
+        <button id="removeAllButton">Stop</button><br />
+        <button id="rampButton">Ramp</button>
+        <span class="ramp">add</span> <input id="rampCount" value="50"/><span class="ramp"> clients every </span> 
+        <input id="rampInterval" value="3"/><span class="ramp"> seconds.</span>
+        <button id="stopRampButton">Stop Ramp</button>
 
-        <button onclick="removeAll()">Remove Clients</button>
 
-        <div id="metricsText">
-          Clients active: <span class="metricVal" id="clientsActive">0</span> total: <span class="metricVal" id="clientsTotal">0</span><br />
-          KB/s: <span class="metricVal" id="KBReceived"></span><br />
-          MB total: <span class="metricVal" id="MBtotal"></span><br />
-          Msg total: <span class="metricVal" id="MsgTotal">0</span><br />
-          Msg/s: <span class="metricVal" id="MsgS">0</span><br />
-        </div>
+    </div>
+
+    <div id="metricsText">
+        Clients active: <span class="metricVal" id="clientsActive">0</span> total: <span class="metricVal" id="clientsTotal">0</span><br />
+        KB/s: <span class="metricVal" id="KBReceived"></span><br />
+        MB total: <span class="metricVal" id="MBtotal"></span><br />
+        Msg total: <span class="metricVal" id="MsgTotal">0</span><br />
+        Msg/s: <span class="metricVal" id="MsgS">0</span><br />
     </div>
     
-    <script>
-
-        var feed = new EventSource('/metricsFeed');
-        feed.addEventListener('message', handler, false);
-
-        function handler(msg){
-          var data = JSON.parse(msg.data);
-          $("#clientsTotal").html(data.clients);
-          $("#clientsActive").html(data.activeClients);
-          $("#KBReceived").html((+data.bytesReceived / 1024 / +data.msSinceLastReset * 1000).toFixed(1));
-          $("#MBtotal").html((+data.bytesReceivedTotal / 1024 / 1024).toFixed(3));
-          $("#MsgTotal").html(data.chunksTotal);
-          $("#MsgS").html((+data.chunks / +data.msSinceLastReset * 1000).toFixed(0));
-        console.log(data);       
-        }
-        
-        function addClients(n) {
-          $.get("/clients/add?n=" + n + "&url=" + $("#urlField").val(), function(data) {
-            console.log(data);
-          });
-        }
-
-        function removeAll() {
-          $.get("/clients/removeAll", function(data) {
-            console.log(data);
-          });
-        }
-        
-    </script>
+    <div id="msgChart" class="barchart">
+        <h2>Messages per Second:</h2>
+        <div id="msgChartSvg"></div>
+    </div>
     
+    <div id="clientsChart" class="barchart">
+        <h2>Active Clients:</h2>
+
+        <div id="clientsChartSvg"></div>
+    </div>
+    
+    <div id="mbSecChart" class="barchart">
+        <h2>MB per Second:</h2>
+
+        <div id="mbSecChartSvg"></div>
+    </div>
+
+    <script src="@routes.Assets.at("javascripts/barchart.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
+
+    <a href="https://github.com/matthiasn"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 }

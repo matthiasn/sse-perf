@@ -1,11 +1,13 @@
 #sse-perf  
 
-I wanted to know how many concurrent Server Sent Event streams my application could handle but I did not find the right tool for this, so I wrote one myself. This web app starts many WS connections with a specified address and measures the amount of data and the number of individual events coming in through all the connections combined.
+This is a web application using **[Play Framework](http://www.playframework.com)** for load testing **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** streams. It will establish concurrent connections to a server and measure and display the combined throughput and number of chunks received per second. The results are then shown in an animated bar chart. Ramping can be used to add a specified amount of additional connections at the specified time interval.
 
-So far the maximum number of concurrent connections I established from this application to another server is 2,700, only because the remote node could not serve more connections in a timely fashion. This app probably would have established a lot more connections.
+Internally **[Akka](http://akka.io)** actors are used to handle the connections and Concurrent.broadcast from **[Play Iteratee API](http://www.playframework.com/documentation/2.1.1/Iteratees)** is used to deliver the information into the **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** stream.
+
+![Screenshot](./docs/screenshot.png)
+
+Please **[Check out my Blog](http://matthiasnehlsen.com)** for additional information, there will be an article about this project in the next couple of days.
  
- Creating additional connections is done in increments of up to 50 additional clients at a time. I have found that doing more at a time more results in a few inactive clients, while up to 50 at a time work fine.  
-
 ###Setup
 There is not much to the setup, given that you have a working installation of Play on your computer. All you need to do is **play run** in your shell, or **play "run 9001"** for example if you are already using port 9000 for the application you want to test. The you need to open **http://localhost:9001**, or whatever port you chose for this application.
 

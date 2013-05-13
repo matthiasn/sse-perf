@@ -6,9 +6,7 @@ import akka.Metrics
 
 object Application extends Controller {
   
-  def index = Action {
-    Ok(views.html.index("Your new application is ready."))
-  }
+  def index = Action { Ok(views.html.index("")) }
 
   /** Serves Server Sent Events over HTTP connection */
   def metricsFeed = Action { implicit req =>  Ok.feed(Metrics.out &> EventSource()).as("text/event-stream") }

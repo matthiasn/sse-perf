@@ -1,19 +1,37 @@
 body {
-    margin: 50px;
+    margin: 20px;
     font-family: sans-serif;
 }
-
 h1 {
     font-size: 1.2em;
 }
-
+h2 {
+    font-size: 1em;
+    line-height: 1em;
+    font-weight: 600;
+}
 #metricsText {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    position: absolute;
+    top: 20px;
+    left: 470px;
+    width: 300px;
 }
 #urlField {
     width: 400px;
 }
 .metricVal {
+    font-weight: bold;
+}
+.barchart {
+    padding-top: 15px;
+}
+#rampCount {
+    width: 20px;
+}
+#rampInterval  {
+    width: 10px;
+}
+.ramp {
+    font-size: 0.8em;
     font-weight: bold;
 }
