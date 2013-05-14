@@ -23,26 +23,25 @@ $(function () {
     }
 
     function addMetric(item) {
-        if (item.activeClients !== 0) {
-            itemsReceived += 1;
-            item.index = itemsReceived;
-            item.chunksTotal = +item.chunksTotal;
-            item.chunks = +item.chunks;
-            item.msSinceLastReset = +item.msSinceLastReset;
-            item.bytesReceivedTotal = +item.bytesReceivedTotal;
-            item.bytesReceived = +item.bytesReceived;
-            item.activeClients = +item.activeClients;
-            item.clients = +item.clients;
-
-            item.kbSec = (item.bytesReceived / 1024 / item.msSinceLastReset * 1000).toFixed(1);
-            item.msgSec = item.chunks / item.msSinceLastReset * 1000;
-            ssePerf.metrics.push(item);
-            if (ssePerf.metrics.length > 30) { ssePerf.metrics.shift(); }
-            me.clientsChart.reDraw();
-            me.msgChart.reDraw();
-            me.mbSecChart.reDraw();
-            updateUI(item);
+        itemsReceived += 1;
+        item.index = itemsReceived;
+        item.chunksTotal = +item.chunksTotal;
+        item.chunks = +item.chunks;
+        item.msSinceLastReset = +item.msSinceLastReset;
+        item.bytesReceivedTotal = +item.bytesReceivedTotal;
+        item.bytesReceived = +item.bytesReceived;
+        item.activeClients = +item.activeClients;
+        item.clients = +item.clients;
+        item.kbSec = (item.bytesReceived / 1024 / item.msSinceLastReset * 1000).toFixed(1);
+        item.msgSec = item.chunks / item.msSinceLastReset * 1000;
+        ssePerf.metrics.push(item);
+        if (ssePerf.metrics.length > 30) {
+            ssePerf.metrics.shift();
         }
+        me.clientsChart.reDraw();
+        me.msgChart.reDraw();
+        me.mbSecChart.reDraw();
+        updateUI(item);
     }
 
     function handler(msg) {
@@ -52,15 +51,23 @@ $(function () {
     feed.addEventListener('message', handler, false);
 
     function addClients(n) {
-        $.get("/clients/add?n=" + n + "&url=" + $("#urlField").val(), function (response) {
-            console.log(response);
-        });
+        $.get("/clients/add?n=" + n + "&url=" + $("#urlField").val() + "&token=" + ssePerf.token)
+            .done(function (response) {
+                console.log(response);
+            })
+            .fail(function () {
+                $("#urlField").val("SORRY, YOU'RE NOT AUTHORIZED.").prop('disabled', true);
+            });
     }
 
     function removeAll() {
-        $.get("/clients/removeAll", function (response) {
-            console.log(response);
-        });
+        $.get("/clients/removeAll" + "?token=" + ssePerf.token)
+            .done(function (response) {            
+                console.log(response);        
+            })
+            .fail(function () {
+                $("#urlField").val("SORRY, YOU'RE NOT AUTHORIZED.").prop('disabled', true);
+            });
         setTimeout(function () {
             ssePerf.metrics = [];
             itemsReceived = 0;
@@ -83,15 +90,26 @@ $(function () {
 
     /** Chart for showing concurrent clients: value and label are identical */
     function clientsValue(d) { return d.activeClients; }
-    me.clientsChart = ssePerf.BarChart(clientsValue, clientsValue, "#clientsChartSvg", "rgb(2, 62, 115)", 960, 150);
+    me.clientsChart = ssePerf.BarChart(clientsValue, clientsValue, "#clientsChartSvg", "rgb(2, 62, 115)", "white", "black", 960, 140);
 
     /** Chart for showing cumulative Msg / sec: value and label are different */
     function msgValue(d) { return d.msgSec; }
-    function msgLabel(d) { return d.msgSec.toFixed(0); }
-    me.msgChart = ssePerf.BarChart(msgValue, msgLabel, "#msgChartSvg", "rgb(3, 140, 127)", 960, 150);
+    function msgLabel(d) {
+        var label;
+        if (d.msgSec > 1000.0) { label = (d.msgSec / 1000).toFixed(1) + "K"; }
+        else { label = d.msgSec.toFixed(0); }
+        return label
+    }
+    me.msgChart = ssePerf.BarChart(msgValue, msgLabel, "#msgChartSvg", "rgb(3, 140, 127)", "white", "black", 960, 140);
 
     /** Chart for showing cumulative MB / sec: value and label are different */
     function mbSecValue(d) { return d.kbSec / 1024; }
-    function mbSecLabel(d) { return (d.kbSec / 1024).toFixed(1); }
-    me.mbSecChart = ssePerf.BarChart(mbSecValue, mbSecLabel, "#mbSecChartSvg", "rgb(242, 154, 46)", 960, 150);
+    function mbSecLabel(d) { 
+        var label;
+        if (d.kbSec < 1000.0) { label = (d.kbSec / 1024).toFixed(3); }
+        else if (d.kbSec < 10000.0) { label = (d.kbSec / 1024).toFixed(2); }
+        else { label = (d.kbSec / 1024).toFixed(1); }
+        return label 
+    }
+    me.mbSecChart = ssePerf.BarChart(mbSecValue, mbSecLabel, "#mbSecChartSvg", "rgb(242, 154, 46)", "black", "black", 960, 140);
 });

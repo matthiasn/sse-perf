@@ -1,8 +1,8 @@
-GET   /                      controllers.Application.index
+GET   /                      controllers.Application.index(token: String ?="")
 
 GET   /metricsFeed           controllers.Application.metricsFeed
-GET   /clients/add           controllers.Application.addClients(n: Int, url: String)
-GET   /clients/removeAll     controllers.Application.removeAllClients
+GET   /clients/add           controllers.Application.addClients(n: Int, url: String, token: String ?="")
+GET   /clients/removeAll     controllers.Application.removeAllClients(token: String ?="")
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file        controllers.Assets.at(path="/public", file)

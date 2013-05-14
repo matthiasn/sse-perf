@@ -6,6 +6,8 @@ Internally **[Akka](http://akka.io)** actors are used to handle the connections 
 
 ![Screenshot](./docs/screenshot.png)
 
+You can **[see this application in action](http:birdwatch.matthiasnehlsen.com:9001)**. I am using it to put a constant load of a few hundred concurrent client connections on my **[BirdWatch](http:birdwatch.matthiasnehlsen.com)** application.
+
 Please **[Check out my Blog](http://matthiasnehlsen.com)** for additional information, there will be an article about this project in the next couple of days.
  
 ###Setup

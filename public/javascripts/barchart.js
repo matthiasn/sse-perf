@@ -2,20 +2,20 @@
 
 var ssePerf = ssePerf || {};
 
-ssePerf.BarChart = function (valueFunction, labelFunction, div, color, w, h) {
+ssePerf.BarChart = function (valueFunction, labelFunction, div, color, textColorInside, textColorOutside, w, h) {
     "use strict";
     var me = {},
         xScale = d3.scale.ordinal().domain(d3.range(ssePerf.metrics.length)).rangeRoundBands([0, w], 0.05),
         yScale = d3.scale.linear().domain([0, d3.max(ssePerf.metrics, valueFunction)]).range([0, h]),
         key = function (d) { return +d.index; },
         svg = d3.select(div).append("svg").attr("width", w).attr("height", h);
-
+    
     me.reDraw = function () {
         var bars = svg.selectAll("rect").data(ssePerf.metrics, key),
             labels = svg.selectAll("text").data(ssePerf.metrics, key);
 
         //Update scale domains
-        xScale.domain(d3.range(ssePerf.metrics.length));
+        xScale.domain(d3.range(ssePerf.metrics.length));    
         yScale.domain([0, d3.max(ssePerf.metrics, valueFunction)]);
 
         //Enter…
@@ -25,7 +25,8 @@ ssePerf.BarChart = function (valueFunction, labelFunction, div, color, w, h) {
             })
             .attr("width", 30)
             .attr("height", function (d) {
-                return yScale(valueFunction(d));
+                d.height = yScale(valueFunction(d));
+                return d.height;
             })
             .attr("fill", color);
 
@@ -36,6 +37,10 @@ ssePerf.BarChart = function (valueFunction, labelFunction, div, color, w, h) {
             })
             .attr("y", function (d) {
                 return h - yScale(valueFunction(d));
+            })
+            .attr("height", function (d) {
+                d.height = yScale(valueFunction(d));
+                return d.height;
             });
 
         //Exit…
@@ -47,13 +52,16 @@ ssePerf.BarChart = function (valueFunction, labelFunction, div, color, w, h) {
             .attr("text-anchor", "middle")
             .attr("x", w)
             .attr("y", function (d) {
-                return h - yScale(valueFunction(d));
+                if (d.height < 16.0) { return h - yScale(valueFunction(d)) - 10; }
+                else return h - yScale(valueFunction(d)) + 12;                
             })
-            .attr("font-family", "sans-serif")
-            .attr("font-size", "8px")
-            .attr("font-weight", "bold")
+            .attr("font-family", "Open Sans")
+            .attr("font-size", "10px")
             .attr("text-anchor", "middle")
-            .attr("fill", "white");
+            .attr("fill", function (d) {
+                if (d.height < 16.0) { return textColorOutside; }
+                else return textColorInside;
+            });
 
         //Update…
         labels.transition().duration(500)
@@ -62,7 +70,12 @@ ssePerf.BarChart = function (valueFunction, labelFunction, div, color, w, h) {
                 return i * 32 + 15;
             })
             .attr("y", function (d) {
-                return h - yScale(valueFunction(d)) + 14;
+                if (d.height < 16.0) { return h - yScale(valueFunction(d)) - 2; }
+                else return h - yScale(valueFunction(d)) + 12;
+            })
+            .attr("fill", function (d) {
+                if (d.height < 16.0) { return textColorOutside; }
+                else return textColorInside;
             });
 
         //Exit…
