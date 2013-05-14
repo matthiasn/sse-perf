@@ -1,6 +1,6 @@
 #sse-perf  
 
-This is a web application using **[Play Framework](http://www.playframework.com)** for load testing **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** streams. It will establish concurrent connections to a server and measure and display the combined throughput and number of chunks received per second. The results are then shown in an animated bar chart. Ramping can be used to add a specified amount of additional connections at the specified time interval.
+This is a web application using **[Play Framework](http://www.playframework.com)** for load testing **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** streams. It will establish concurrent connections to a server and measure and display the combined throughput and number of chunks received per second. The results are then shown using animated bar charts. Ramping can be used to add a specified amount of additional connections at the specified time interval.
 
 Internally **[Akka](http://akka.io)** actors are used to handle the connections and Concurrent.broadcast from **[Play Iteratee API](http://www.playframework.com/documentation/2.1.1/Iteratees)** is used to deliver the information into the **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** stream.
 
@@ -8,10 +8,10 @@ Internally **[Akka](http://akka.io)** actors are used to handle the connections 
 
 You can **[see this application in action](http:birdwatch.matthiasnehlsen.com:9001)**. I am using it to put a constant load of a few hundred concurrent client connections on my **[BirdWatch](http:birdwatch.matthiasnehlsen.com)** application.
 
-Please **[Check out my Blog](http://matthiasnehlsen.com)** for additional information, there will be an article about this project in the next couple of days.
+Please **[Check out my Blog](http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/)** for more information about this project.
  
 ###Setup
-There is not much to the setup, given that you have a working installation of Play on your computer. All you need to do is **play run** in your shell, or **play "run 9001"** for example if you are already using port 9000 for the application you want to test. The you need to open **http://localhost:9001**, or whatever port you chose for this application.
+There is not much to the setup, given that you have a working installation of **[Play Framework](http://www.playframework.com)** on your computer. All you need to do is **play run** in your shell, or **play "run 9001"** for example if you are already using port 9000 for the application you want to test. The you need to open **http://localhost:9001**, or whatever port you chose for this application.
 
 ## Licence
 
