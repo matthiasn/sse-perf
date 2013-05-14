@@ -1,0 +1,10 @@
+@(jsonList: List[play.api.libs.json.JsValue])
+    
+@main("Access Log") {
+    <ul>
+    @jsonList.map { x =>
+        <li>@{x \ "timestamp"} &nbsp; @{x \ "country_code"} &nbsp; @{x \ "city"} &nbsp; @{x \ "ip"} </li>
+    }
+    </ul>
+
+}

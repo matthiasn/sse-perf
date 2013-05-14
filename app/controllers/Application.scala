@@ -9,11 +9,11 @@ import play.api.Play._
 object Application extends Controller {
   
   val accessToken = current.configuration.getString("metrics.accessToken").getOrElse("")
-    
+
   def index(token: String) = Action {
     implicit req => {
       RequestLogger.log(req, "/", 200)
-      Ok(views.html.index(token)) 
+      Ok(views.html.metrics(token)) 
     }
   }
 

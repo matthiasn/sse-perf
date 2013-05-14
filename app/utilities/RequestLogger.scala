@@ -2,11 +2,13 @@ package utilities
 
 import play.api.mvc.{Request, AnyContent}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.WS
 
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import scala.concurrent.Future
+import reactivemongo.api.Cursor
 
 object RequestLogger {
 
@@ -60,5 +62,14 @@ object RequestLogger {
         "httpCode" -> httpCode
       ))
     }
+  }
+
+  /** Query latest tweets as List */
+  def latestVisitor(n: Int): Future[List[JsObject]] = {
+    val cursor: Cursor[JsObject] = Mongo.accessLog
+      .find(Json.obj())
+      .sort(Json.obj("_id" -> -1))
+      .cursor[JsObject]
+    cursor.toList(n)
   }
 }
