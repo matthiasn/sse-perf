@@ -1,15 +1,11 @@
 package utilities
 
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import reactivemongo.api.MongoDriver
+import play.api.Play.current
 import play.modules.reactivemongo.json.collection.JSONCollection
+import play.modules.reactivemongo.ReactiveMongoPlugin
 
 /** Mongo connection object */
 object Mongo {
-  val driver = new MongoDriver
-  val connection = driver.connection(List("localhost:27017"))
-  val db = connection("sse-perf")
-
+  def db = ReactiveMongoPlugin.db
   def accessLog: JSONCollection = db.collection[JSONCollection]("accessLog")
 }

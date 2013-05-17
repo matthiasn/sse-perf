@@ -2,8 +2,8 @@ package controllers
 
 import play.api.mvc._
 import play.api.Play._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import utilities.RequestLogger
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 object AccessLog extends Controller {
   
@@ -13,7 +13,8 @@ object AccessLog extends Controller {
     implicit req => {
       if (token == accessToken) {
         RequestLogger.log(req, "/accessLog", 200)
-        Async { RequestLogger.latestVisitor(500).map { visitors => Ok(views.html.accesslog(visitors)) }   
+        Async { RequestLogger.latestVisitors(500).map { 
+          visitors => Ok(views.html.accesslog(visitors.filter(x => !(x \ "request").as[String].contains("accessLog")))) }   
         }
       }
       else {

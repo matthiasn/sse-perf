@@ -72,3 +72,13 @@ a {
 #token {
     visibility: hidden;
 }
+#heartbeat {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 18px;
+    left: 530px;
+}
+li {
+    list-style-type: none;
+}

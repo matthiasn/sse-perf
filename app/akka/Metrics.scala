@@ -1,14 +1,16 @@
 package akka
 
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
 import akka.actor._
 import akka.event.Logging
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.{Concurrent, Iteratee}
 import play.api.libs.ws.WS
 import play.api.libs.json._
 
+import scala.language.postfixOps
 import scala.concurrent.duration._
+
 import org.joda.time.DateTime
 
 /** Actors related to Metrics collection */

@@ -11,6 +11,13 @@ require(["barchart"], function (chart) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  var heartbeat = d3.select("#heartbeat").append("svg").attr("width", 20).attr("height", 20)
+    .append("circle")
+    .attr("cx", 10)
+    .attr("cy", 10)
+    .attr("r", 3)
+    .attr("fill", "red");
+
   function updateUI(d) {
     $("#clientsTotal").html(numberWithCommas(d.clients));
     $("#clientsActive").html(numberWithCommas(d.activeClients));
@@ -18,6 +25,7 @@ require(["barchart"], function (chart) {
     $("#MBtotal").html(numberWithCommas((d.bytesReceivedTotal / 1024 / 1024).toFixed(0)));
     $("#MsgTotal").html(numberWithCommas(d.chunksTotal));
     $("#MsgS").html(numberWithCommas(d.msgSec.toFixed(0)));
+    heartbeat.transition().duration(500).attr("r", 7).transition().duration(500).attr("r", 3);
   }
 
   function addMetric(item) {
@@ -32,14 +40,16 @@ require(["barchart"], function (chart) {
     item.clients = +item.clients;
     item.kbSec = (item.bytesReceived / 1024 / item.msSinceLastReset * 1000).toFixed(1);
     item.msgSec = item.chunks / item.msSinceLastReset * 1000;
-    me.metrics.push(item);
-    if (me.metrics.length > 30) {
-      me.metrics.shift();
-    }
-    me.clientsChart.reDraw();
-    me.msgChart.reDraw();
-    me.mbSecChart.reDraw();
-    updateUI(item);
+    updateUI(item);    
+    if (item.chunks > 0) {
+      me.metrics.push(item);
+      if (me.metrics.length > 30) {
+        me.metrics.shift();
+      }
+      me.clientsChart.reDraw();
+      me.msgChart.reDraw();
+      me.mbSecChart.reDraw();
+    }    
   }
 
   function handler(msg) {

@@ -2,7 +2,7 @@ package utilities
 
 import play.api.mvc.{Request, AnyContent}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.WS
 
 import org.joda.time.DateTime
@@ -26,7 +26,9 @@ object RequestLogger {
       "ip" -> req.remoteAddress,
       "request" -> req.toString(),
       "user-agent" -> userAgent,
-      "timestamp" -> dtFormat.print(DateTime.now())
+      "timestamp" -> dtFormat.print(DateTime.now()),
+      "desc" -> desc,
+      "httpCode" -> httpCode
     )
 
     /** freegeoip needs IPv4 addresses, ignore local requests with IPv6 addresses for logging */
@@ -43,9 +45,7 @@ object RequestLogger {
             "region" -> response.json \ "region_name",
             "city" -> response.json \ "city",
             "long" -> response.json \ "longitude",
-            "lat" -> response.json \ "latitude",
-            "desc" -> desc,
-            "httpCode" -> httpCode
+            "lat" -> response.json \ "latitude"
           ))
         }
       }
@@ -65,11 +65,11 @@ object RequestLogger {
   }
 
   /** Query latest tweets as List */
-  def latestVisitor(n: Int): Future[List[JsObject]] = {
-    val cursor: Cursor[JsObject] = Mongo.accessLog
+  def latestVisitors(n: Int): Future[List[JsValue]] = {
+    val cursor: Cursor[JsValue] = Mongo.accessLog
       .find(Json.obj())
       .sort(Json.obj("_id" -> -1))
-      .cursor[JsObject]
+      .cursor[JsValue]
     cursor.toList(n)
   }
 }
