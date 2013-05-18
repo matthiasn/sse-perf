@@ -2,7 +2,15 @@ require(["barchart"], function (chart) {
   var feed = new EventSource('/metricsFeed'),
     itemsReceived = 0,
     me = {},
-    timer;
+    timer,
+    heartbeat;
+  
+  heartbeat = d3.select("#heartbeat").append("svg").attr("width", 20).attr("height", 20)
+      .append("circle")
+      .attr("cx", 10)
+      .attr("cy", 10)
+      .attr("r", 3)
+      .attr("fill", "red");
 
   me.metrics = [];
 
@@ -11,13 +19,6 @@ require(["barchart"], function (chart) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  var heartbeat = d3.select("#heartbeat").append("svg").attr("width", 20).attr("height", 20)
-    .append("circle")
-    .attr("cx", 10)
-    .attr("cy", 10)
-    .attr("r", 3)
-    .attr("fill", "red");
-
   function updateUI(d) {
     $("#clientsTotal").html(numberWithCommas(d.clients));
     $("#clientsActive").html(numberWithCommas(d.activeClients));
@@ -25,7 +26,6 @@ require(["barchart"], function (chart) {
     $("#MBtotal").html(numberWithCommas((d.bytesReceivedTotal / 1024 / 1024).toFixed(0)));
     $("#MsgTotal").html(numberWithCommas(d.chunksTotal));
     $("#MsgS").html(numberWithCommas(d.msgSec.toFixed(0)));
-    heartbeat.transition().duration(500).attr("r", 7).transition().duration(500).attr("r", 3);
   }
 
   function addMetric(item) {
@@ -55,6 +55,11 @@ require(["barchart"], function (chart) {
   function handler(msg) {
     var data = JSON.parse(msg.data);
     addMetric(data);
+
+    heartbeat.transition().duration(700).attr("r", 7)
+      .transition().duration(700).attr("r", 3)
+      .transition().duration(700).attr("r", 6)
+      .transition().duration(700).attr("r", 3);
   }
 
   feed.addEventListener('message', handler, false);
