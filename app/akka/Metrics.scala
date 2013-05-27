@@ -17,13 +17,13 @@ import org.joda.time.DateTime
 object Metrics {
   val (out, channel) = Concurrent.broadcast[JsValue]
 
-  /** BirdWatch actor system */
+  /** SSE-Perf actor system */
   val system = ActorSystem("sse-perf")
 
-  /** Supervisor for Tweet stream client */
+  /** Supervisor for WS client */
   val wsClientSupervisor = system.actorOf(Props(new Supervisor(system.eventStream)).withDispatcher("my-thread-pool-dispatcher"), "WsClientSupervisor")
 
-  /** Checking status of Twitter Streaming API connection every 30 seconds */
+  /** Publishing status every 3 seconds */
   system.scheduler.schedule(3 seconds, 3 seconds, wsClientSupervisor, Publish)
   
   /** Protocol for Twitter Client actors */
@@ -48,7 +48,6 @@ class Supervisor(eventStream: akka.event.EventStream) extends Actor with ActorLo
   var activeClients = scala.collection.mutable.Set[ActorRef]()
   var clients = scala.collection.mutable.Set[ActorRef]()
 
-  /** Receives control messages for starting / restarting supervised client and adding or removing topics */
   def receive = {
 
     case Metrics.Received(bytes) => {
@@ -93,8 +92,9 @@ class Supervisor(eventStream: akka.event.EventStream) extends Actor with ActorLo
   }
 }
 
-/** Image retrieval actor, receives Tweets, retrieves the Twitter profile images for each user and passes them on to
-  * conversion actor. */
+/** WS client actor. Not strictly necessary for establishing connections, only starts WS connection 
+  * on creation and then passes metrics on to parent actor. Actor reference for is useful for 
+  * counting active clients (in a Set of ActorRefs that gets emptied on each Publish message) */
 class WsClient(url: String) extends Actor with ActorLogging {
   override val log = Logging(context.system, this)
   override def preStart() { }
@@ -105,19 +105,13 @@ class WsClient(url: String) extends Actor with ActorLogging {
   var bytesReceivedTotal: Long = 0L
   var bytesReceived: Long = 0L
 
-  /** Iteratee for processing each chunk from Twitter stream of Tweets. Parses Json chunks 
-    * as Tweet instances and publishes them to eventStream. */
-  val chunkIteratee = Iteratee.foreach[Array[Byte]] { 
-    chunk => {      
-      self ! Metrics.Received(chunk.size)
-    }
-  }
+  /** Iteratee for processing chunks from each WS client. */
+  val chunkIteratee = Iteratee.foreach[Array[Byte]] { chunk => self ! Metrics.Received(chunk.size) }
 
   /** Connection to specified URL streaming chunks into supplied chunkIteratee */
   val conn = WS.url(url).withTimeout(-1).get(_ => chunkIteratee)
   
-  /** Connects to Twitter Streaming API and retrieve a stream of Tweets for the specified search word or words.
-    * Passes received chunks of data into tweetIteratee */
+  /** Receives and passes on metrics. */
   def receive = {
 
     case Metrics.Received(bytes)  => {
